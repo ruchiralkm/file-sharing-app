@@ -45,7 +45,7 @@ HTML_TEMPLATE = """
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('https://source.unsplash.com/random/1920x1080?cloud,travel');
+            background-image: url('https://wallpaperaccess.com/full/1750461.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
