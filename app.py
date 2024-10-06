@@ -1,3 +1,25 @@
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template_string, jsonify
+import os
+import sys
+import logging
+
+app = Flask(__name__)
+
+# Configure logging
+logging.basicConfig(level=logging.ERROR)
+
+# Folder to store uploaded files
+UPLOAD_FOLDER = '/tmp/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+# HTML code embedded as a template string with enhanced stylish UI
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +45,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('https://wallpaperaccess.com/full/1750461.jpg');
+            background-image: url('https://source.unsplash.com/random/1920x1080?cloud,travel');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -240,3 +262,73 @@
     </script>
 </body>
 </html>
+"""
+
+# Error handler for all exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    app.logger.error('An error occurred: %s', str(e), exc_info=True)
+    return render_template_string("""
+        <h1>An Error Occurred</h1>
+        <p>Sorry, an unexpected error has occurred. Please try again later.</p>
+        <p>Error: {{ error }}</p>
+    """, error=str(e)), 500
+
+# Home route: Show upload form and list of uploaded files
+@app.route('/')
+def home():
+    try:
+        files = os.listdir(app.config['UPLOAD_FOLDER'])
+        file_sizes = {}
+        for file in files:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file)
+            size = os.path.getsize(file_path)
+            file_sizes[file] = f"{size / 1024:.2f} KB"
+        return render_template_string(HTML_TEMPLATE, files=files, file_sizes=file_sizes)
+    except Exception as e:
+        app.logger.error('Error in home route: %s', str(e), exc_info=True)
+        return handle_exception(e)
+
+# Upload files from phone/PC
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    try:
+        if 'file' not in request.files:
+            raise ValueError('No file part')
+        
+        file = request.files['file']
+        if file.filename == '':
+            raise ValueError('No selected file')
+        
+        if file:
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(file_path)
+            return jsonify({'success': True, 'message': 'File uploaded successfully'})
+    except Exception as e:
+        app.logger.error('Error in upload_file route: %s', str(e), exc_info=True)
+        return jsonify({'success': False, 'message': str(e)})
+
+# Download files to mobile/PC
+@app.route('/download/<filename>')
+def download_file(filename):
+    try:
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    except Exception as e:
+        app.logger.error('Error in download_file route: %s', str(e), exc_info=True)
+        return handle_exception(e)
+
+# Reset (remove all files)
+@app.route('/reset', methods=['POST'])
+def reset_files():
+    try:
+        for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        return redirect(url_for('home'))
+    except Exception as e:
+        app.logger.error('Error in reset_files route: %s', str(e), exc_info=True)
+        return handle_exception(e)
+
+if __name__ == '__main__':
+    app.run(debug=True)
