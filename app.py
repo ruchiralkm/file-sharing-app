@@ -16,10 +16,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# HTML code embedded as a template string with enhanced stylish UI
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,7 +41,7 @@ HTML_TEMPLATE = """
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('https://wallpaperaccess.com/full/1750461.jpg');
+            background-image: url('https://source.unsplash.com/random/1920x1080?cloud,travel');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -99,15 +95,6 @@ HTML_TEMPLATE = """
             background-color: #e59400;
             transform: translateY(-2px);
         }
-        .btn-download {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-        .btn-download:hover {
-            background-color: #3a7bc8;
-        }
         .file-input {
             display: none;
         }
@@ -145,17 +132,6 @@ HTML_TEMPLATE = """
         .file-item:hover {
             transform: translateX(5px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .file-info {
-            display: flex;
-            align-items: center;
-        }
-        .file-name {
-            margin-right: 15px;
-        }
-        .file-size {
-            color: #666;
-            font-size: 0.9em;
         }
         .file-link {
             color: var(--primary-color);
@@ -212,11 +188,8 @@ HTML_TEMPLATE = """
         <ul class="file-list">
             {% for file in files %}
                 <li class="file-item">
-                    <div class="file-info">
-                        <span class="file-name">{{ file }}</span>
-                        <span class="file-size">{{ file_sizes.get(file, 'Unknown size') }}</span>
-                    </div>
-                    <a href="{{ url_for('download_file', filename=file) }}" class="btn btn-download">Download</a>
+                    <a class="file-link" href="{{ url_for('download_file', filename=file) }}">{{ file }}</a>
+                    <span>{{ file_sizes.get(file, 'Unknown size') }}</span>
                 </li>
             {% else %}
                 <li>No files uploaded yet.</li>
