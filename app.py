@@ -23,7 +23,7 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Stylish File Sharing</title>
+    <title>FileBeam</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -55,7 +55,7 @@ HTML_TEMPLATE = """
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(2px);
         }
         h1 {
             color: var(--primary-color);
@@ -190,7 +190,12 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <h1>Ultra Stylish File Sharing</h1>
+        <h1>FileBeam</h1>
+        <center>
+          <h5>©Designed by Ruchira Kaluarachchi</h5>
+          <p>Scan this QR code with other device</p>
+          <img src="https://raw.githubusercontent.com/ruchiralkm/Small-Testing/refs/heads/main/Assets/frame.png" alt="qr-code" style="width: 150px; height: 150px;">
+        </center>
         <div class="upload-section">
             <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
                 <label for="file-upload" class="file-label">Choose File</label>
@@ -206,6 +211,7 @@ HTML_TEMPLATE = """
                 <input type="submit" class="btn btn-danger" value="Reset (Remove All Files)">
             </form>
         </div>
+        <center><span style="color:red;">This application made testing purposes for only</span></center>
         <h2>Uploaded Files</h2>
         <ul class="file-list">
             {% for file in files %}
