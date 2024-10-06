@@ -1,36 +1,15 @@
-from flask import Flask, request, redirect, url_for, send_from_directory, render_template_string, jsonify
-import os
-import sys
-import logging
-
-app = Flask(__name__)
-
-# Configure logging
-logging.basicConfig(level=logging.ERROR)
-
-# Folder to store uploaded files
-UPLOAD_FOLDER = '/tmp/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure the folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-# HTML code embedded as a template string with enhanced stylish UI
-HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Stylish File Sharing App</title>
+    <title>Ultra Stylish File Sharing</title>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #e74c3c;
-            --accent-color: #2ecc71;
-            --background-color: #ecf0f1;
-            --text-color: #2c3e50;
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --background-color: #f0f4f8;
+            --text-color: #333;
             --card-background: #ffffff;
         }
         body {
@@ -39,19 +18,24 @@ HTML_TEMPLATE = """
             color: var(--text-color);
             background-color: var(--background-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            background-image: url('https://wallpaperaccess.com/full/1750461.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         .container {
             max-width: 800px;
-            width: 100%;
-            background-color: var(--card-background);
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
         h1 {
             color: var(--primary-color);
@@ -82,7 +66,7 @@ HTML_TEMPLATE = """
             color: white;
         }
         .btn-primary:hover {
-            background-color: #2980b9;
+            background-color: #3a7bc8;
             transform: translateY(-2px);
         }
         .btn-danger {
@@ -90,8 +74,17 @@ HTML_TEMPLATE = """
             color: white;
         }
         .btn-danger:hover {
-            background-color: #c0392b;
+            background-color: #e59400;
             transform: translateY(-2px);
+        }
+        .btn-download {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .btn-download:hover {
+            background-color: #3a7bc8;
         }
         .file-input {
             display: none;
@@ -99,7 +92,7 @@ HTML_TEMPLATE = """
         .file-label {
             display: inline-block;
             padding: 12px 24px;
-            background-color: var(--accent-color);
+            background-color: var(--primary-color);
             color: white;
             border-radius: 50px;
             cursor: pointer;
@@ -109,7 +102,7 @@ HTML_TEMPLATE = """
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .file-label:hover {
-            background-color: #27ae60;
+            background-color: #3a7bc8;
             transform: translateY(-2px);
         }
         .file-list {
@@ -131,6 +124,17 @@ HTML_TEMPLATE = """
             transform: translateX(5px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+        .file-name {
+            margin-right: 15px;
+        }
+        .file-size {
+            color: #666;
+            font-size: 0.9em;
+        }
         .file-link {
             color: var(--primary-color);
             text-decoration: none;
@@ -150,7 +154,7 @@ HTML_TEMPLATE = """
         .progress-bar {
             width: 0;
             height: 30px;
-            background-color: var(--accent-color);
+            background-color: var(--primary-color);
             text-align: center;
             line-height: 30px;
             color: white;
@@ -160,7 +164,7 @@ HTML_TEMPLATE = """
             text-align: center;
             margin-top: 10px;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--primary-color);
         }
     </style>
 </head>
@@ -186,8 +190,11 @@ HTML_TEMPLATE = """
         <ul class="file-list">
             {% for file in files %}
                 <li class="file-item">
-                    <a class="file-link" href="{{ url_for('download_file', filename=file) }}">{{ file }}</a>
-                    <span>{{ file_sizes.get(file, 'Unknown size') }}</span>
+                    <div class="file-info">
+                        <span class="file-name">{{ file }}</span>
+                        <span class="file-size">{{ file_sizes.get(file, 'Unknown size') }}</span>
+                    </div>
+                    <a href="{{ url_for('download_file', filename=file) }}" class="btn btn-download">Download</a>
                 </li>
             {% else %}
                 <li>No files uploaded yet.</li>
@@ -233,73 +240,3 @@ HTML_TEMPLATE = """
     </script>
 </body>
 </html>
-"""
-
-# Error handler for all exceptions
-@app.errorhandler(Exception)
-def handle_exception(e):
-    app.logger.error('An error occurred: %s', str(e), exc_info=True)
-    return render_template_string("""
-        <h1>An Error Occurred</h1>
-        <p>Sorry, an unexpected error has occurred. Please try again later.</p>
-        <p>Error: {{ error }}</p>
-    """, error=str(e)), 500
-
-# Home route: Show upload form and list of uploaded files
-@app.route('/')
-def home():
-    try:
-        files = os.listdir(app.config['UPLOAD_FOLDER'])
-        file_sizes = {}
-        for file in files:
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file)
-            size = os.path.getsize(file_path)
-            file_sizes[file] = f"{size / 1024:.2f} KB"
-        return render_template_string(HTML_TEMPLATE, files=files, file_sizes=file_sizes)
-    except Exception as e:
-        app.logger.error('Error in home route: %s', str(e), exc_info=True)
-        return handle_exception(e)
-
-# Upload files from phone/PC
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    try:
-        if 'file' not in request.files:
-            raise ValueError('No file part')
-        
-        file = request.files['file']
-        if file.filename == '':
-            raise ValueError('No selected file')
-        
-        if file:
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(file_path)
-            return jsonify({'success': True, 'message': 'File uploaded successfully'})
-    except Exception as e:
-        app.logger.error('Error in upload_file route: %s', str(e), exc_info=True)
-        return jsonify({'success': False, 'message': str(e)})
-
-# Download files to mobile/PC
-@app.route('/download/<filename>')
-def download_file(filename):
-    try:
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-    except Exception as e:
-        app.logger.error('Error in download_file route: %s', str(e), exc_info=True)
-        return handle_exception(e)
-
-# Reset (remove all files)
-@app.route('/reset', methods=['POST'])
-def reset_files():
-    try:
-        for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-        return redirect(url_for('home'))
-    except Exception as e:
-        app.logger.error('Error in reset_files route: %s', str(e), exc_info=True)
-        return handle_exception(e)
-
-if __name__ == '__main__':
-    app.run(debug=True)
