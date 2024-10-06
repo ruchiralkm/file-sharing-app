@@ -60,6 +60,7 @@ HTML_TEMPLATE = """
         h1 {
             color: var(--primary-color);
             text-align: center;
+            margin-top: -20px;
             margin-bottom: 30px;
             font-size: 2.5em;
             text-transform: uppercase;
@@ -192,7 +193,9 @@ HTML_TEMPLATE = """
     <div class="container">
         <h1>FileBeam</h1>
         <center>
-          <h5>©Designed by Ruchira Kaluarachchi</h5>
+          <div style="margin-top:-40px;">
+            <h5>©Designed by Ruchira Kaluarachchi</h5>
+          </div>
           <p>Scan this QR code with other device</p>
           <img src="https://raw.githubusercontent.com/ruchiralkm/Small-Testing/refs/heads/main/Assets/frame.png" alt="qr-code" style="width: 150px; height: 150px;">
         </center>
