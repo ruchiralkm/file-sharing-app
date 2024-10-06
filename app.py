@@ -16,6 +16,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+# HTML code embedded as a template string with enhanced stylish UI
+HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,6 +97,15 @@ if not os.path.exists(UPLOAD_FOLDER):
             background-color: #e59400;
             transform: translateY(-2px);
         }
+        .btn-download {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .btn-download:hover {
+            background-color: #3a7bc8;
+        }
         .file-input {
             display: none;
         }
@@ -132,6 +143,17 @@ if not os.path.exists(UPLOAD_FOLDER):
         .file-item:hover {
             transform: translateX(5px);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+        .file-name {
+            margin-right: 15px;
+        }
+        .file-size {
+            color: #666;
+            font-size: 0.9em;
         }
         .file-link {
             color: var(--primary-color);
@@ -188,8 +210,11 @@ if not os.path.exists(UPLOAD_FOLDER):
         <ul class="file-list">
             {% for file in files %}
                 <li class="file-item">
-                    <a class="file-link" href="{{ url_for('download_file', filename=file) }}">{{ file }}</a>
-                    <span>{{ file_sizes.get(file, 'Unknown size') }}</span>
+                    <div class="file-info">
+                        <span class="file-name">{{ file }}</span>
+                        <span class="file-size">{{ file_sizes.get(file, 'Unknown size') }}</span>
+                    </div>
+                    <a href="{{ url_for('download_file', filename=file) }}" class="btn btn-download">Download</a>
                 </li>
             {% else %}
                 <li>No files uploaded yet.</li>
