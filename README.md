@@ -1,4 +1,4 @@
-# FileBeam
+# FileBeam - Files-sharing-app
 
 **FileBeam** is a sleek and user-friendly web application for uploading, downloading, and managing files between devices. Designed with a focus on simplicity and modern UI/UX, it ensures a seamless file-sharing experience.
 
