@@ -6,7 +6,6 @@
 Live preview 👉 https://online-file-sharing-app.vercel.app/
 
 ![Home Page](https://raw.githubusercontent.com/ruchiralkm/Small-Testing/refs/heads/main/Assets/Screenshot%202025-01-07%20201628.png?token=GHSAT0AAAAAAC4SBWDE6LT56Y2W4BO2E2NIZ35LKPA)
-*Figure 1: FileBeam Home Page*
 
 
 ## Features
