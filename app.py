@@ -197,7 +197,7 @@ HTML_TEMPLATE = """
             <h5>©Designed by Ruchira Kaluarachchi</h5>
           </div>
           <p>Scan this QR code with other device</p>
-          <img src="https://raw.githubusercontent.com/ruchiralkm/Small-Testing/refs/heads/main/Assets/frame.png" alt="qr-code" style="width: 150px; height: 150px;">
+          <img src="https://raw.githubusercontent.com/ruchiralkm/Small-Testing/refs/heads/main/Assets/frame.png?token=GHSAT0AAAAAAC4SBWDEBWWN7B4C55UIJACMZ35JOWA" alt="qr-code" style="width: 150px; height: 150px;">
         </center>
         <div class="upload-section">
             <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
